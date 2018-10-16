@@ -2,10 +2,9 @@ package retry
 
 import (
 	"errors"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDoAllFailed(t *testing.T) {
@@ -17,18 +16,7 @@ func TestDoAllFailed(t *testing.T) {
 	)
 	assert.Error(t, err)
 
-	expectedErrorFormat := `All attempts fail:
-#1: test
-#2: test
-#3: test
-#4: test
-#5: test
-#6: test
-#7: test
-#8: test
-#9: test
-#10: test`
-	assert.Equal(t, expectedErrorFormat, err.Error(), "retry error format")
+	assert.Equal(t, "test", err.Error(), "retry error format")
 	assert.Equal(t, uint(45), retrySum, "right count of retry")
 }
 
@@ -61,11 +49,7 @@ func TestRetryIf(t *testing.T) {
 	)
 	assert.Error(t, err)
 
-	expectedErrorFormat := `All attempts fail:
-#1: test
-#2: test
-#3: special`
-	assert.Equal(t, expectedErrorFormat, err.Error(), "retry error format")
+	assert.Equal(t, "special", err.Error(), "retry error format")
 	assert.Equal(t, uint(3), retryCount, "right count of retry")
 
 }
