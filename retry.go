@@ -81,14 +81,19 @@ func Do(retryableFunc RetryableFunc, opts ...Option) error {
 		opt(config)
 	}
 
-	errorLog := make(Error, config.attempts)
+	errorLog := make(Error, 0)
 
-	for n < config.attempts {
+	cond := n < config.attempts
+	if n == 0 {
+		cond = true
+	}
+
+	for cond {
 		err := retryableFunc()
 
 		if err != nil {
 			config.onRetry(n, err)
-			errorLog[n] = err
+			errorLog = append(errorLog, err)
 
 			if !config.retryIf(err) {
 				break
@@ -99,8 +104,7 @@ func Do(retryableFunc RetryableFunc, opts ...Option) error {
 				break
 			}
 
-			delayTime := config.delay * (1 << (n - 1))
-			time.Sleep((time.Duration)(delayTime) * config.units)
+			time.Sleep((time.Duration)(config.delay) * config.units)
 		} else {
 			return nil
 		}

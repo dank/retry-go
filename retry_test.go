@@ -80,3 +80,15 @@ func TestDefaultSleep(t *testing.T) {
 	assert.Error(t, err)
 	assert.True(t, dur > 10*time.Millisecond, "3 times default retry is longer then 10ms")
 }
+
+func TestAttempts(t *testing.T) {
+	var retryCount uint
+	err := Do(
+		func() error { return errors.New("test") },
+		OnRetry(func(n uint, err error) { retryCount++ }),
+		Attempts(3),
+	)
+
+	assert.Error(t, err)
+	assert.Equal(t, uint(3), retryCount, "right count of retry")
+}
